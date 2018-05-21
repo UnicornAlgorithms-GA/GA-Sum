@@ -4,7 +4,6 @@ using System.Linq;
 using GASum;
 using GASum.GA;
 using GeneticLib.Generations;
-using GeneticLib.Genome;
 using GeneticLib.GenomeFactory;
 using GeneticLib.GenomeFactory.GenomeProducer;
 using GeneticLib.GenomeFactory.GenomeProducer.Breeding;
@@ -16,28 +15,27 @@ using GeneticLib.Randomness;
 
 namespace GA_Sum
 {
-    class Program
+	class Program
     {
-		int targetSum = 50;
-		int targetFitness = 50;
+		int targetSum = 50000;
         
 		int genomesCount = 50;
-		int genesCount = 5;
+		int genesCount = 500;
 
-		int minGeneValue = 0;
-		int maxGeneValue = 400;
+		int minGeneValue = -1000;
+		int maxGeneValue = 1000;
 
 		float geneDeltaMutationPart = 0.1f;
-		float geneNbMutationChance = 0.2f;
+		float geneNbMutationChance = 0.1f;
 
-		float crossoverPart = 0.90f;
-		float reinsertionPart = 0.1f;
+		float crossoverPart = 0.80f;
+		float reinsertionPart = 0.2f;
 
 		SumGeneticManager geneticManager;
 		FitnessEvaluation fitnessEvaluation;
 
 		public bool targetReached = false;
-		public int maxIterations = 100;
+		public int maxIterations = 10000;
 
 		static void Main(string[] args)
 		{
@@ -119,7 +117,7 @@ namespace GA_Sum
 			              .CurrentGeneration
 			              .Genomes = orderedGenomes;
 
-			if (Math.Abs(orderedGenomes.First().Fitness - targetFitness) < 0.1)
+			if (Math.Abs(orderedGenomes.First().Fitness - targetSum) < 0.1)
 			{
 				targetReached = true;
 			}
