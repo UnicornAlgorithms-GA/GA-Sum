@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using GASum.GA;
 using GeneticLib.Generations;
 using GeneticLib.Genome;
@@ -17,6 +18,7 @@ namespace GA_Sum
     class Program
     {
 		int targetSum = 200;
+		int targetFitness = 200;
 
 		int genomesCount = 50;
 		int genesCount = 5;
@@ -27,9 +29,26 @@ namespace GA_Sum
 		float geneDeltaMutationPart = 0.1f;
 		float geneNbMutationChance = 0.1f;
 
+		float crossoverPart = 0.7f;
+		float reinsertionPart = 0.3f;
+
+		SumGeneticManager geneticManager;
+		FitnessEvaluation fitnessEvaluation;
+
+		public bool targetReached = false;
+		public int maxIterations = 100;
+
 		static void Main(string[] args)
 		{
-			
+			var program = new Program();
+
+			for (int i = 0; i < program.maxIterations; i++)
+			{
+				if (program.targetReached)
+					break;
+
+				program.Evolve();
+			}
 		}
 
 		public Program()
@@ -49,25 +68,57 @@ namespace GA_Sum
 			var crossover = new OnePointCrossover(useBothChildren: true);
 
 			var breeding = new BreedingClassic(
-				selection,
-				crossover,
-				InitMutations());
+				crossoverPart,
+				minProduction: 1,
+				selection: selection,
+				crossover: crossover,
+				mutationManager: InitMutations());
 
-            //var reinsertion =
+			var reinsertion = new EliteReinsertion(
+				reinsertionPart, 
+				minProduction:1);
 
 			var producers = new List<IGenomeProducer>
 			{
-				
+				reinsertion,
+				breeding
 			};
 
-			var genomeForge = new GenomeForge();
+			var genomeForge = new GenomeForge(producers);
+            
+			geneticManager = new SumGeneticManager(
+				generationManager,
+				initialGenerationGenerator,
+				genomeForge,
+				genomesCount
+			);
+
+			fitnessEvaluation = new FitnessEvaluation();
 
 
-			//var geneticManager = new SumGeneticManager(
-			//	generationManager,
-			//	initialGenerationGenerator,
-			//);
         }
+
+		public void Evolve()
+		{
+			var genomes = geneticManager.GenerationManager.CurrentGeneration.Genomes;
+
+			foreach (var genome in genomes)
+				genome.Fitness = fitnessEvaluation.Evaluate(targetSum, genome);
+
+			var orderedGenomes = genomes.OrderByDescending(g => g.Fitness)
+										.ToArray();
+
+			geneticManager.GenerationManager
+			              .CurrentGeneration
+			              .Genomes = orderedGenomes;
+
+			if (Math.Abs(orderedGenomes.First().Fitness - targetFitness) < 5)
+			{
+				targetReached = true;
+			}
+
+			geneticManager.Evolve();
+		}
 
 		private MutationManager InitMutations()
 		{

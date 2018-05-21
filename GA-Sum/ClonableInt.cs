@@ -15,5 +15,5 @@ namespace GASum
 		{
 			return new ClonableInt(Value);
 		}
-	}
+   	}
 }
