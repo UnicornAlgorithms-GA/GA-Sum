@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GASum;
 using GASum.GA;
 using GeneticLib.Generations;
 using GeneticLib.Genome;
@@ -17,9 +18,9 @@ namespace GA_Sum
 {
     class Program
     {
-		int targetSum = 200;
-		int targetFitness = 200;
-
+		int targetSum = 50;
+		int targetFitness = 50;
+        
 		int genomesCount = 50;
 		int genesCount = 5;
 
@@ -27,10 +28,10 @@ namespace GA_Sum
 		int maxGeneValue = 400;
 
 		float geneDeltaMutationPart = 0.1f;
-		float geneNbMutationChance = 0.1f;
+		float geneNbMutationChance = 0.2f;
 
-		float crossoverPart = 0.7f;
-		float reinsertionPart = 0.3f;
+		float crossoverPart = 0.90f;
+		float reinsertionPart = 0.1f;
 
 		SumGeneticManager geneticManager;
 		FitnessEvaluation fitnessEvaluation;
@@ -44,6 +45,11 @@ namespace GA_Sum
 
 			for (int i = 0; i < program.maxIterations; i++)
 			{
+				Console.WriteLine(String.Format(
+					"{0}) sum = {1}",
+					i,
+					program.CurrentBestSum()));
+				
 				if (program.targetReached)
 					break;
 
@@ -53,7 +59,7 @@ namespace GA_Sum
 
 		public Program()
         {
-			GARandomManager.Random = new Random(1);
+			GARandomManager.Random = new Random((int)DateTime.Now.Ticks);
             
 			var generationManager = new GenerationManagerKeepLast();
 
@@ -92,6 +98,7 @@ namespace GA_Sum
 				genomeForge,
 				genomesCount
 			);
+			geneticManager.Init();
 
 			fitnessEvaluation = new FitnessEvaluation();
 
@@ -112,7 +119,7 @@ namespace GA_Sum
 			              .CurrentGeneration
 			              .Genomes = orderedGenomes;
 
-			if (Math.Abs(orderedGenomes.First().Fitness - targetFitness) < 5)
+			if (Math.Abs(orderedGenomes.First().Fitness - targetFitness) < 0.1)
 			{
 				targetReached = true;
 			}
@@ -130,6 +137,16 @@ namespace GA_Sum
 				EMutationType.Independent));
 			
 			return mutManager;
+		}
+
+		public int CurrentBestSum()
+		{
+			return geneticManager.GenerationManager
+				                 .CurrentGeneration
+				                 .Genomes
+				                 .First()
+				                 .Genes
+				                 .Sum(g => (g.Value as ClonableInt).Value);
 		}
     }
 }

@@ -17,7 +17,7 @@ namespace GASum.GA
 			var sum = genome.Genes.Sum(g => (g.Value as ClonableInt).Value);
 			var delta = Math.Abs(targetSum - sum);
 
-			return Math.Abs(targetSum - delta);
+			return targetSum - delta;
 		}
     }
 }
