@@ -4,12 +4,13 @@ using System.Linq;
 using GASum;
 using GASum.GA;
 using GeneticLib.Generations;
+using GeneticLib.GeneticManager;
 using GeneticLib.GenomeFactory;
 using GeneticLib.GenomeFactory.GenomeProducer;
 using GeneticLib.GenomeFactory.GenomeProducer.Breeding;
 using GeneticLib.GenomeFactory.GenomeProducer.Breeding.Crossover;
-using GeneticLib.GenomeFactory.GenomeProducer.Breeding.Selection;
 using GeneticLib.GenomeFactory.GenomeProducer.Reinsertion;
+using GeneticLib.GenomeFactory.GenomeProducer.Selection;
 using GeneticLib.GenomeFactory.Mutation;
 using GeneticLib.Randomness;
 
@@ -31,7 +32,7 @@ namespace GA_Sum
 		float crossoverPart = 0.80f;
 		float reinsertionPart = 0.2f;
 
-		SumGeneticManager geneticManager;
+		GeneticManagerClassic geneticManager;
 		FitnessEvaluation fitnessEvaluation;
 
 		public bool targetReached = false;
@@ -57,7 +58,7 @@ namespace GA_Sum
 
 		public Program()
         {
-			GARandomManager.Random = new Random((int)DateTime.Now.Ticks);
+			GARandomManager.Random = new RandomClassic((int)DateTime.Now.Ticks);
             
 			var generationManager = new GenerationManagerKeepLast();
 
@@ -78,9 +79,10 @@ namespace GA_Sum
 				crossover: crossover,
 				mutationManager: InitMutations());
 
-			var reinsertion = new EliteReinsertion(
-				reinsertionPart, 
-				minProduction:1);
+			var reinsertion = new ReinsertionFromSelection(
+				reinsertionPart,
+				minProduction: 1,
+				selection: new EliteSelection());
 
 			var producers = new List<IGenomeProducer>
 			{
@@ -90,7 +92,7 @@ namespace GA_Sum
 
 			var genomeForge = new GenomeForge(producers);
             
-			geneticManager = new SumGeneticManager(
+			geneticManager = new GeneticManagerClassic(
 				generationManager,
 				initialGenerationGenerator,
 				genomeForge,
@@ -98,9 +100,7 @@ namespace GA_Sum
 			);
 			geneticManager.Init();
 
-			fitnessEvaluation = new FitnessEvaluation();
-
-
+			fitnessEvaluation = new FitnessEvaluation();         
         }
 
 		public void Evolve()

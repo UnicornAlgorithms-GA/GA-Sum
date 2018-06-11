@@ -1,8 +1,9 @@
 ﻿using System;
+using GeneticLib.Utils;
 
 namespace GASum
 {
-	public class ClonableInt : ICloneable
+	public class ClonableInt : IDeepClonable<ClonableInt>
 	{
 		public int Value { get; set; }
 
@@ -11,7 +12,7 @@ namespace GASum
 			Value = val;
 		}
 
-		public object Clone()
+		public ClonableInt Clone()
 		{
 			return new ClonableInt(Value);
 		}

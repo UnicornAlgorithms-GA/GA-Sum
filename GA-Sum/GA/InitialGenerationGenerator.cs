@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GeneticLib.Generations.InitialGeneration;
 using GeneticLib.Genome;
+using GeneticLib.Genome.Genes;
 using GeneticLib.Randomness;
 
 namespace GASum.GA

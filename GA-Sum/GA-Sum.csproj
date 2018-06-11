@@ -11,4 +11,7 @@
   <ItemGroup>
     <Folder Include="GA\" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="GA\SumGeneticManager.cs" />
+  </ItemGroup>
 </Project>

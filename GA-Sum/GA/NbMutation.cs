@@ -1,5 +1,6 @@
 ﻿using System;
 using GeneticLib.Genome;
+using GeneticLib.Genome.Genes;
 using GeneticLib.GenomeFactory.Mutation;
 using GeneticLib.Randomness;
 
